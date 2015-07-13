@@ -5,7 +5,6 @@ library(shinyBS)
 library(rPython)
 library(ggvis)
 library(leaflet)
-#library(dplyr)
 library(parallel)
 
 
@@ -32,11 +31,6 @@ server <- function(input, output, session) {
                                 device = character(), sensorname = character(),
                                 x = numeric(), y = numeric(), z = numeric(),
                                 stringsAsFactors=FALSE)
-  dataGeo <- data.frame(ip = character(), recordTime = integer(),
-                                cognitoId = character(),
-                                device = character(), sensorname = character(),
-                                lat = numeric(), long = numeric(),
-                                stringsAsFactors=FALSE)  
   messageData <- data.frame(text=character(),
                             cognitoId=character(),
                             status=character(),
@@ -69,14 +63,7 @@ server <- function(input, output, session) {
     if(length(data_new_Motion)!=0){
       colnames(data_new_Motion) <- c("recordTime", "cognitoId", "device", "sensorname","x","y","z")
     }
-    data_new_Geo <- mclapply(res$Records, function(x) {
-      if(x["PartitionKey"]=="geoLocation"){
-        unlist(fromJSON(x["Data"]))[c("recordTime", "cognitoId", "device", "sensorname","lat","long")] }})
-    data_new_Geo <- as.data.frame(do.call(rbind, data_new_Geo), stringsAsFactors=FALSE) 
-    if(length(data_new_Geo)!=0){
-      colnames(data_new_Geo) <- c("recordTime", "cognitoId", "device", "sensorname","lat","long")
-    }
-    
+      
     ########
     # Data corrections for format
      if( length(data_new_Orientation) != 0 ){
@@ -109,22 +96,7 @@ server <- function(input, output, session) {
         data_new_Motion <- data_new_Motion %>% filter(recordTime < as.numeric(Sys.time()))
      }
     
-
-    
-     if( length(data_new_Geo) != 0 ){
-      data_new_Geo$recordTime <- as.numeric(data_new_Geo$recordTime)
-      data_new_Geo$lat <- as.numeric(data_new_Geo$lat)
-      data_new_Geo$long <- as.numeric(data_new_Geo$long)
-      
-      # omit null ids and na recordTimes
-      data_new_Geo <- data_new_Geo %>% filter(cognitoId != "null")
-      data_new_Geo <- data_new_Geo %>% filter(!is.na(recordTime))
-      
-      # remove phones with timestamps in the future 
-      data_new_Geo <- data_new_Geo %>% filter(recordTime < as.numeric(Sys.time()))
-    }
-    
-     list(data_new_Orientation, data_new_Motion, data_new_Geo)
+     list(data_new_Orientation, data_new_Motion)
   })
 
   getNewOrientationData <- reactive({
@@ -135,10 +107,6 @@ server <- function(input, output, session) {
     data <- getDataFromStream()
     data[[2]]
   })
-  getNewGeoData <- reactive({
-    data <- getDataFromStream()
-    data[[3]]
-  })
   
   ############
   # ALARMS based on new data from stream
@@ -146,7 +114,6 @@ server <- function(input, output, session) {
      
      data_new_Orientation <- getNewOrientationData()
      data_new_Motion <- getNewMotionData()
-     data_new_Geo <- getNewGeoData()
      
      ###############
      # Data aggregation
@@ -165,12 +132,6 @@ server <- function(input, output, session) {
             summarise(x=mean(x),
                       y=mean(y),
                       z=mean(z))
-        data_new_Geo <- data_new_Geo %>% 
-            mutate(recordTime=round(recordTime, 
-                                    digits=as.integer(input$agg))) %>%
-            group_by(recordTime, cognitoId, sensorname, device) %>%
-            summarise(lat=mean(lat),
-                      long=mean(long))
      }
 
     # Freefall warning
@@ -236,7 +197,6 @@ server <- function(input, output, session) {
     
     data_new_Orientation <- getNewOrientationData()
     data_new_Motion <- getNewMotionData()
-    data_new_Geo <- getNewGeoData()
     
     #######
     # Combine data_new and data old
@@ -250,17 +210,11 @@ server <- function(input, output, session) {
     } else if(length(data_new_Motion) != 0) {      
       dataMotion <- as.data.frame( rbind(dataMotion,data_new_Motion), stringsAsFactors=FALSE)
     }
-    if( dim(dataGeo)[1]==0 && length(data_new_Geo) != 0 ){
-      dataGeo <- data_new_Geo
-    } else if(length(data_new_Geo) != 0) {      
-      dataGeo <- as.data.frame( rbind(dataGeo,data_new_Geo), stringsAsFactors=FALSE)
-    }
-    
+      
     ###########
     # remove very old data (bigger than 240 secs)
     dataOrientation <- dataOrientation %>% filter(recordTime > ( as.numeric(Sys.time()) - 240) )
     dataMotion <- dataMotion %>% filter(recordTime > ( as.numeric(Sys.time()) - 240) )
-    dataGeo <- dataGeo %>% filter(recordTime > ( as.numeric(Sys.time()) - 240) )
     
 
     ##############
@@ -268,7 +222,6 @@ server <- function(input, output, session) {
     # DO WE NEED THAT?
     dataOrientation <<- dataOrientation
     dataMotion <<- dataMotion
-    dataGeo <<- dataGeo
     
     ###############
     # Data aggregation
@@ -287,21 +240,14 @@ server <- function(input, output, session) {
              summarise(x=mean(x),
                        y=mean(y),
                        z=mean(z))
-       dataGeo <- dataGeo %>% 
-             mutate(recordTime=round(recordTime, 
-                                     digits=as.integer(input$agg))) %>%
-             group_by(recordTime, cognitoId, sensorname, device) %>%
-             summarise(lat=mean(lat),
-                       long=mean(long))
      }
     
     ##################
     #debugging
     assign("dataOrientation",dataOrientation, env=.GlobalEnv)
     assign("dataMotion",dataMotion, env=.GlobalEnv)
-    assign("dataGeo",dataGeo, env=.GlobalEnv)
     
-    list(dataOrientation, dataMotion, dataGeo)
+    list(dataOrientation, dataMotion)
   }) 
   getOrientationData <- reactive({
     data <- combineData()
@@ -310,10 +256,6 @@ server <- function(input, output, session) {
   getMotionData <- reactive({
     data <- combineData()
     data[[2]]
-  })
-  getGeoData <- reactive({
-    data <- combineData()
-    data[[3]]
   })
   
   
@@ -452,44 +394,6 @@ server <- function(input, output, session) {
             bind_shiny("accZ") 
 
 
-  
-#   # Device type
-#   # ToDo no updates ???
-#   devType <- reactive({
-#     newstreamdata <- getMotionData()
-#     
-#     if( dim(newstreamdata)[1] == 0) {
-#       out <- data.frame(device=character())
-#     } else {
-#       out <- newstreamdata %>% 
-#         group_by(device, cognitoId) %>% 
-#         summarise(length(device))  
-#     }   
-#   out
-#   }) 
-#   devType %>% ggvis(~device) %>%
-#     layer_bars() %>%
-#     add_axis("x", title = "Device type") %>%
-#     set_options(height=150, width=NULL) %>%
-#     bind_shiny("deviceTypes") 
-#   
-
-
-  #######################
-  # Map
-  output$myMap <- renderLeaflet({
-    dataGeo <- getGeoData()
-    dataGeoSplit <- by(dataGeo[, c("lat", "long")], dataGeo$cognitoId, function(x)x)
-    dataGeoSplit <- lapply(dataGeoSplit, function(x)rbind(x, NA))
-    dataGeoSplit <- do.call(rbind, dataGeoSplit)
-    palette("default")
-    m <- leaflet() %>% addTiles() %>% 
-          addPolylines(lng=round(dataGeoSplit$long,6), 
-                       lat=round(dataGeoSplit$lat,6), 
-                       fill = FALSE,
-                       color=palette())
-    m  
-  })
    
   ########################
   # RAWDATA output
@@ -502,12 +406,6 @@ server <- function(input, output, session) {
    output$rawtableOrientation <- renderPrint({
       orig <- options(width = 1000)
       streamdata <- getOrientationData()
-      print(tail(streamdata[,-4], input$maxrows))
-      options(orig)
-    })
-   output$rawtableGeo <- renderPrint({
-      orig <- options(width = 1000)
-      streamdata <- getGeoData()
       print(tail(streamdata[,-4], input$maxrows))
       options(orig)
     })
@@ -525,15 +423,6 @@ server <- function(input, output, session) {
       filename = "IoTSensorDemoDataMotion.csv",
       content = function(file) {
         streamdata <- getMotionData()
-        streamdata <- streamdata %>% arrange(recordTime)
-        write.csv(streamdata, file)
-      },
-      contentType = "text/csv"
-    )
-    output$downloadGeoCsv <- downloadHandler(
-      filename = "IoTSensorDemoDataGeo.csv",
-      content = function(file) {
-        streamdata <- getGeoData()
         streamdata <- streamdata %>% arrange(recordTime)
         write.csv(streamdata, file)
       },

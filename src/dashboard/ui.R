@@ -10,13 +10,13 @@ ui <- dashboardPage(
   
   dashboardHeader(
     title = "IoT Sensor Demo EU",
+    #title = "IoT Sensor Demo US",
     dropdownMenuOutput("dropdownMenu")
     ),
   
   dashboardSidebar(
     sidebarMenu(
       menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
-      #menuItem("Map", tabName = "map", icon = icon("map-marker")),
       menuItem("Alarm details", tabName = "alarms", icon = icon("warning")),
       menuItem("Raw data", tabName = "rawdata", icon = icon("th")),
       menuItem("Simulating Data", tabName = "simulation", icon = icon("random")),
@@ -34,8 +34,6 @@ ui <- dashboardPage(
                   "100ms"=1,
                   "1s" = 0,
                   "10s" = -1), selected=5)
-
-    #actionButton("clearMessages", "Clear Notifications")
   ),
   
   
@@ -74,24 +72,6 @@ ui <- dashboardPage(
                  bsAlert("alert_anchor")
           )
         )
-#         fluidRow(
-#           column(6,
-#                  box(
-#                    width = NULL, status = "info", solidHeader = TRUE,
-#                    title = "Device Type",
-#                    collapsible = TRUE,
-#                    ggvisOutput("deviceTypes")  
-#                  )
-#           ),
-#           column(6,
-#                  box(
-#                    width = NULL, status = "info", solidHeader = TRUE,
-#                    title = "Horizontal or Vertical?",
-#                    collapsible = TRUE,
-#                    p("comming soon")  
-#                  )
-#             )
-#         )
       ),
       
       tabItem("map",
@@ -104,11 +84,8 @@ ui <- dashboardPage(
               verbatimTextOutput("rawtableOrientation"),
               h4("Motion Sensor Data"),
               verbatimTextOutput("rawtableMotion"),
-              #h4("Geo Location Data"),
-              #verbatimTextOutput("rawtableGeo"),
               downloadButton("downloadOrientationCsv", "Download Orientation as CSV"),
               downloadButton("downloadMotionCsv", "Download Motion as CSV")
-              #downloadButton("downloadGeoCsv", "Download Geo as CSV")
       ),
       
       tabItem(tabName = "alarms",
@@ -172,9 +149,8 @@ ui <- dashboardPage(
                 column(8,
                   h2("Sensor Description"),
                   h3("Producer Webpage URL"),
-                  #img(src="https://s3-eu-west-1.amazonaws.com/iotsensordemo/qrcode.jpeg", width="200"),
-                  a("http://iot.aws-proserv.de", 
-                    href="http://iot.aws-proserv.de",
+                  a("http://iot.aws-cloudlab.org", 
+                    href="http://iot.aws-cloudlab.org",
                     target="_blank"),                  
                   h3("Device Motion"),
                   p("Describes the acceleration of your device in a coordinate frame with three axes, x, y and z. 
