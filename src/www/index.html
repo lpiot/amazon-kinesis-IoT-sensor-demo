@@ -90,8 +90,8 @@ function init() {
     // get AWS credentials from Cognito in eu-west-1
 	AWS.config.region = 'eu-west-1'; 
 	AWS.config.credentials = new AWS.CognitoIdentityCredentials(
-		{ AccountId: '374311255271', IdentityPoolId: 'eu-west-1:b23b2b5b-b1c8-45ff-b7fb-3dd73c8f1466', 
-		RoleArn: 'arn:aws:iam::374311255271:role/Cognito_IoTSensorDemoUnauth_DefaultRole' }); 
+		{ AccountId: '454979696062', IdentityPoolId: 'eu-west-1:e727b637-5679-4e38-adaa-3b2c646cbde6:',
+		RoleArn: 'arn:aws:iam::454979696062:role/Cognito_IoTSensorDemoUnauth_DefaultRole' });
 	AWS.config.credentials.get(function() { 
 		console.log("updated aws config with web identity federation:\n", AWS.config.credentials);
 		AWS.config.identityId = AWS.config.credentials.identityId; 
