@@ -1,4 +1,4 @@
-# Amazon Kinesis IoT Sensor Demo - "
+# Amazon Kinesis IoT Sensor Demo
 IoT Sensor Demo using Amazon Kinesis and R shiny
 
 
