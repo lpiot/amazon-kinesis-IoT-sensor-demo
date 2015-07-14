@@ -11,12 +11,12 @@ import datetime
 import multiprocessing
 import random
 import sys
+import urllib
 
 
 # CONFIG
-REGION = 'eu-central-1'
-#REGION = 'us-west-2'
-STREAMNAME = 'IoTSensorDemoEUCentral'
+REGION = urllib.urlopen('http://169.254.169.254/latest/meta-data/placement/availability-zone').read()[:-1]
+STREAMNAME = 'IoTSensorDemo'
 FNAMEACC = str(sys.argv[4])
 FNAMEORI = str(sys.argv[5])
 FNAMEGEO = str(sys.argv[6])
