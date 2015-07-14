@@ -1,0 +1,42 @@
+  * {
+				font-family: Arial, Helvetica, sans-serif;
+			}
+
+			.dataGroup {
+				border: 1px dashed #000;
+				padding: 10px;
+				margin: 20px;
+				-webkit-perspective: 300; perspective: 300;
+			}
+			
+		    .logo {
+		      width:200px;
+		      margin-left: auto;
+		      margin-right: auto;
+		      display: block;
+		      padding: 15px;
+		    }
+    
+
+			table {
+				margin-bottom: 20px;
+			}
+
+			tr {
+				padding: 5px;
+			}
+
+			th, td {
+				text-align: left;
+				padding: 8px;
+			}
+
+			table tbody th {
+				width: 300px;
+				background-color: #EEE;
+			}
+
+			table tbody td {
+				width: 100px;
+				background-color: lightyellow;
+			}
