@@ -18,3 +18,4 @@ vignettes/*.pdf
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+.Rproj.user
