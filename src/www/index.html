@@ -3,7 +3,7 @@
 <head>
 			<meta charset="utf-8">
 
-			<title>AWS IoT Sensor Demo Producer</title>
+			<title>AWS IoT Sensor Demo - Producer</title>
 
             <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.5.min.js" type="text/javascript"></script>	
 
@@ -87,20 +87,20 @@ function printDataValue(input) {
 // function to collect data and send it to Kinesis
 function init() {
 	
-    // get AWS credentials from Cognito in eu-west-1
+  // get AWS credentials from Cognito in eu-west-1
 	AWS.config.region = 'eu-west-1'; 
 	AWS.config.credentials = new AWS.CognitoIdentityCredentials(
-		{ AccountId: '454979696062', IdentityPoolId: 'eu-west-1:e727b637-5679-4e38-adaa-3b2c646cbde6',
-		RoleArn: 'arn:aws:iam::454979696062:role/Cognito_IoTSensorDemoUnauth_Role' });
+		{ AccountId: '374311255271', IdentityPoolId: 'eu-west-1:b23b2b5b-b1c8-45ff-b7fb-3dd73c8f1466',
+		RoleArn: 'arn:aws:iam::374311255271:role/Cognito_IoTSensorDemoUnauth_DefaultRole' });
 	AWS.config.credentials.get(function() { 
 		console.log("updated aws config with web identity federation:\n", AWS.config.credentials);
 		AWS.config.identityId = AWS.config.credentials.identityId; 
 		console.log("identityId:", AWS.config.identityId); 
 	});
 
-    // region switch to connect with correct Kinesis
-    //AWS.config.region = 'us-west-2';
-    AWS.config.region = 'eu-west-1';
+  // region switch to connect with correct Kinesis
+  //AWS.config.region = 'us-west-2';
+  AWS.config.region = 'eu-west-1';
 	var kinesis = new AWS.Kinesis();
 	//console.log(kinesis)
     var sregion = document.getElementById("sregion");
@@ -241,14 +241,12 @@ window.onload = init;
     
     <img align="right" alt="" src="aws_proserve_logo.png" width="300" />
     <div>
-        <h1>AWS IoT Sensor Demo Producer</h1>
-        <p>Screen-Adjusted DeviceOrientation, Screen-Adjusted DeviceMotion, device type and Cognito Id will be send every <select name="update" id="update">
+        <h1>AWS IoT Sensor Demo - Producer</h1>
+        <p>You sensor data 'Screen-Adjusted DeviceOrientation' and 'Screen-Adjusted DeviceMotion', and your device type and Cognito Id are tracked every 300ms. The data is send every <select name="update" id="update">
             <option value=1>1</option>
-            <option value=2>2</option>
             <option value=3 selected>3</option>
-            <option value=4>4</option>
             <option value=5>5</option>
-        </select> seconds via https to the AWS Cloud <b id="sregion">-</b> region and stored for data anlyses. Have fun getting part of a Internet of Things Sensor Demo.</p>
+        </select> seconds via https to the AWS Cloud <b id="sregion">-</b> region and stored for data anlyses. Have fun getting part of an Internet of Things Sensor Demo.</p>
     </div>
     
     
@@ -325,6 +323,8 @@ window.onload = init;
 
 
 <p><em>Data values, where provided, are rounded to two decimal places for readability.</em></p>
+
+<p><em>This IoT sensor demo is developed and maintained by <a href="http://aws.amazon.com/professional-services/">AWS Professional Serivces</a> Big Data Analytics Practice. Code and documentation is available at <a href="https://github.com/schmidb/amazon-kinesis-IoT-sensor-demo">https://github.com/schmidb/amazon-kinesis-IoT-sensor-demo</a>. For more details please contact schmidbe@amazon.de.</em></p>
 
 <p><em>Thanks to Rich Tibbett and Pete LePage for providing this demo code at <a href="https://richtr.github.io/Full-Tilt/examples/data_display.html" target="_blank">github.io</a> and <a href="http://www.html5rocks.com/en/tutorials/device/orientation/" target="_blank">www.html5rocks.com</a></em>.</p>
 
