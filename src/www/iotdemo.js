@@ -54,7 +54,6 @@ function init() {
 	});
 
   // region switch to connect with correct Kinesis
-  //AWS.config.region = 'us-west-2';
   AWS.config.region = 'eu-west-1';
 	var kinesis = new AWS.Kinesis();
 	//console.log(kinesis)

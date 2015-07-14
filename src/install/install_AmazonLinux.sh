@@ -63,6 +63,13 @@ sudo su - \
 sudo yum install -y git
 git clone https://github.com/schmidb/amazon-kinesis-IoT-sensor-demo.git
 
+
+sudo sed -i -- 's/arn:aws:iam::374311255271:role/Cognito_IoTSensorDemoUnauth_DefaultRole/YOURROLE/g' amazon-kinesis-IoT-sensor-demo/src/www/iotdemo.js
+sudo sed -i -- 's/374311255271/YOURACCOUNTID/g' amazon-kinesis-IoT-sensor-demo/src/www/iotdemo.js
+sudo sed -i -- 's/eu-west-1:b23b2b5b-b1c8-45ff-b7fb-3dd73c8f1466/YOURIDENTITYPOOL/g' amazon-kinesis-IoT-sensor-demo/src/www/iotdemo.js
+sudo sed -i -- 's/eu-west-1/YOURREGION/g' amazon-kinesis-IoT-sensor-demo/src/www/iotdemo.js
+
+
 sudo cp amazon-kinesis-IoT-sensor-demo/src/install/shiny-server.conf /etc/shiny-server/shiny-server.conf
 sudo restart shiny-server
 
