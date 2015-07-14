@@ -19,7 +19,6 @@ REGION = urllib.urlopen('http://169.254.169.254/latest/meta-data/placement/avail
 STREAMNAME = 'IoTSensorDemo'
 FNAMEACC = str(sys.argv[4])
 FNAMEORI = str(sys.argv[5])
-FNAMEGEO = str(sys.argv[6])
 RUNS = int(sys.argv[1])
 SENDTIME = int(sys.argv[3])
 SIMPHONES = int(sys.argv[2])
@@ -40,16 +39,11 @@ ff = f.readlines()
 headerORI = ff[0].replace("\n","").replace("\"","").split(',')[1:]
 linesORI = ff[1:]
 f.close()
-f = open(FNAMEGEO,'r')
-ff = f.readlines()
-headerGEO = ff[0].replace("\n","").replace("\"","").split(',')[1:]
-linesGEO = ff[1:]
-f.close()
 
 
 # Main Simulation function
 # print end-start # we are to slow for 30Hz )-:   
-def sim(header,linesACC,linesORI,linesGEO,SIMIP,RUNS,REGION,STREAMNAME,RANDOMSTART):
+def sim(header,linesACC,linesORI,SIMIP,RUNS,REGION,STREAMNAME,RANDOMSTART):
     
     # Kinesis connection
     kinesisConn = kinesis.connect_to_region(REGION)
@@ -82,7 +76,7 @@ def sim(header,linesACC,linesORI,linesGEO,SIMIP,RUNS,REGION,STREAMNAME,RANDOMSTA
             jsonobj = json.loads(jsonstr)
             ts = time.time()
             jsonobj["recordTime"] = ts
-            jsonobj["cognitoId"] = "eu-west-1:" + str(abs(hash(SIMIP)))
+            jsonobj["cognitoId"] = "sim:" + str(abs(hash(SIMIP)))
             record = {'Data': json.dumps(jsonobj),'PartitionKey':str('screenAccG')}
             records.append(record)
             
@@ -102,28 +96,8 @@ def sim(header,linesACC,linesORI,linesGEO,SIMIP,RUNS,REGION,STREAMNAME,RANDOMSTA
             jsonobj = json.loads(jsonstr)
             ts = time.time()
             jsonobj["recordTime"] = ts
-            jsonobj["cognitoId"] = "eu-west-1:" + str(abs(hash(SIMIP)))
+            jsonobj["cognitoId"] = "sim:" + str(abs(hash(SIMIP)))
             record = {'Data': json.dumps(jsonobj),'PartitionKey':str('screenAdjustedEvent')}
-            records.append(record)
-            
-            lineGEO = linesGEO[startline+count]
-            jsonstr = ''
-            liGEO = lineGEO.split(',')
-            i = 0
-            for l in liGEO[1:]:
-                l=l.replace("\n","").replace("\"","")
-                if( headerGEO[i] == "device" or headerGEO[i] == "sensorname" or headerGEO[i] == "cognitoId"):
-                    dat = '"' + headerGEO[i] + '":"' + l +'"'
-                else:
-                    dat = '"' + headerGEO[i] + '":' + l
-                jsonstr = jsonstr + "," + dat
-                i = i +1
-            jsonstr = "{"+ jsonstr[1:] + "}"
-            jsonobj = json.loads(jsonstr)
-            ts = time.time()
-            jsonobj["recordTime"] = ts
-            jsonobj["cognitoId"] = "eu-west-1:" + str(abs(hash(SIMIP)))
-            record = {'Data': json.dumps(jsonobj),'PartitionKey':str('geoLocation')}
             records.append(record)
             
             count = count + 1
@@ -141,7 +115,7 @@ def sim(header,linesACC,linesORI,linesGEO,SIMIP,RUNS,REGION,STREAMNAME,RANDOMSTA
 
 	
 # Testing    
-#sim(header,linesACC,linesORI,linesGEO,'10.0.10.1',RUNS,REGION,STREAMNAME,RANDOMSTART)
+#sim(header,linesACC,linesORI,'10.0.10.1',RUNS,REGION,STREAMNAME,RANDOMSTART)
 
 
 
@@ -151,7 +125,7 @@ print "Simulate "+ str(SIMPHONES) + " PHONES"
 jobs = []
 for i in range(SIMPHONES):
     SIMIP = SIMIPS + str(i)
-    p = multiprocessing.Process(target=sim, args=(headerACC,linesACC,linesORI,linesGEO,SIMIP,RUNS,REGION,STREAMNAME,RANDOMSTART))
+    p = multiprocessing.Process(target=sim, args=(headerACC,linesACC,linesORI,SIMIP,RUNS,REGION,STREAMNAME,RANDOMSTART))
     jobs.append(p)
     p.start()
 

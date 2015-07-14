@@ -795,8 +795,7 @@ server <- function(input, output, session) {
               input$simnrdevices,
               input$sendtime,
               "data_sim/data/cleanSimData_Motion.csv",
-              "data_sim/data/cleanSimData_Orientation.csv",
-              "data_sim/data/cleanSimData_Geo.csv"
+              "data_sim/data/cleanSimData_Orientation.csv"
         ), wait = FALSE, ignore.stdout = TRUE)
       out <- "Simulation started ..."
     } else {
