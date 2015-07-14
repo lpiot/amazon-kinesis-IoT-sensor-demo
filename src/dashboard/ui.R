@@ -5,12 +5,15 @@ library(shinyBS)
 library(dplyr)
 library(ggvis)
 library(leaflet)
+library(RCurl)
+
+az <- httpGET("http://169.254.169.254/latest/meta-data/placement/availability-zone")
+regionshort <- toupper(substr(az,1,2))
 
 ui <- dashboardPage(
   
   dashboardHeader(
-    title = "IoT Sensor Demo EU",
-    #title = "IoT Sensor Demo US",
+    title = paste("IoT Sensor Demo", regionshort),
     dropdownMenuOutput("dropdownMenu")
     ),
   
