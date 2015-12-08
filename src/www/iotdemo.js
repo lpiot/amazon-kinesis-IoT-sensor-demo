@@ -132,7 +132,7 @@ function init() {
 	});
 	
 	
-    // create JSON objec to put into kinesis
+    // create JSON object to put into kinesis
 	function CreateKinesisInput() {
 		
 		var cT = new Date().getTime()/1000;

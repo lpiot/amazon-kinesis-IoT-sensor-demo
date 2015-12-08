@@ -71,18 +71,18 @@ server <- function(input, output, session) {
    
     data_new_Orientation <- mclapply(res$Records, function(x) {
       if(x["PartitionKey"]=="screenAdjustedEvent"){
-        unlist(fromJSON(x["Data"]))[c("recordTime", "cognitoId", "device", "sensorname","alpha","beta","gamma")] }})
+        unlist(fromJSON(unlist(x["Data"])))[c("recordTime", "cognitoId", "device", "sensorname","alpha","beta","gamma")] }})
     data_new_Orientation <- as.data.frame(do.call(rbind, data_new_Orientation), stringsAsFactors=FALSE) 
-    if(length(data_new_Orientation)!=0){  
-      colnames(data_new_Orientation) <- c("recordTime", "cognitoId", "device", "sensorname","alpha","beta","gamma")
-    }
+    # if(length(data_new_Orientation)!=0){
+    #   colnames(data_new_Orientation) <- c("recordTime", "cognitoId", "device", "sensorname","alpha","beta","gamma")
+    # }
     data_new_Motion <- mclapply(res$Records, function(x) {
       if(x["PartitionKey"]=="screenAccG"){
-        unlist(fromJSON(x["Data"]))[c("recordTime", "cognitoId", "device", "sensorname","x","y","z")] }})
+        unlist(fromJSON(unlist(x["Data"])))[c("recordTime", "cognitoId", "device", "sensorname","x","y","z")] }})
     data_new_Motion <- as.data.frame(do.call(rbind, data_new_Motion), stringsAsFactors=FALSE) 
-    if(length(data_new_Motion)!=0){
-      colnames(data_new_Motion) <- c("recordTime", "cognitoId", "device", "sensorname","x","y","z")
-    }
+    # if(length(data_new_Motion)!=0){
+    #   colnames(data_new_Motion) <- c("recordTime", "cognitoId", "device", "sensorname","x","y","z")
+    # }
       
     ########
     # Data corrections for format
